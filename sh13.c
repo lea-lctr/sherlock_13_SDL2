@@ -254,16 +254,19 @@ int main(int argc, char **argv) {
             sprintf(sendBuffer, "G %d %d", gId, guiltSel);
 
             // RAJOUTER DU CODE ICI
+			sendMessageToServer(gServerIpAddress, gServerPort, sendBuffer);
 
           } else if ((objetSel != -1) && (joueurSel == -1)) {
             sprintf(sendBuffer, "O %d %d", gId, objetSel);
 
             // RAJOUTER DU CODE ICI
+			sendMessageToServer(gServerIpAddress, gServerPort, sendBuffer);
 
           } else if ((objetSel != -1) && (joueurSel != -1)) {
             sprintf(sendBuffer, "S %d %d %d", gId, joueurSel, objetSel);
 
             // RAJOUTER DU CODE ICI
+			sendMessageToServer(gServerIpAddress, gServerPort, sendBuffer);
           }
         } else {
           joueurSel = -1;
