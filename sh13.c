@@ -334,7 +334,7 @@ int main(int argc, char **argv) {
       case 'M':
         // RAJOUTER DU CODE ICI
 		// on reçoit le n° du joueur courant de la forme "M %d"
-		int n_m = sscanf(gbuffer, "M %d", &joueurSel);
+		int n_m = sscanf(gbuffer, "M %d", &id);
 		if (n_m != 1) {
 			// Si on n'a pas lu exactement 1 entier, gérer l'erreur
 			fprintf(stderr, "Erreur de format sur le message M : reçu '%s'\n", gbuffer);
@@ -345,12 +345,43 @@ int main(int argc, char **argv) {
         break;
       // Message 'V' : le joueur recoit une valeur de tableCartes
       case 'V':
-        // RAJOUTER DU CODE ICI
+            // Mise à jour tableCartes : réception "V <joueur> <symbole> <valeur>"
+            {
+                int p, sym, val;
+                if (sscanf(gbuffer, "V %d %d %d", &p, &sym, &val) == 3) {
+                    tableCartes[p][sym] = val;
+                }
+            }
+            break;
 
-        break;
+      // Message 'W' : quelqu’un a gagné
+      case 'W':
+      {
+        int winner;
+        if (sscanf(gbuffer, "W %d", &winner) == 1) {
+          printf(">>> Le joueur %d a remporté la partie !\n", winner);
+          // ici tu peux, par exemple, arrêter la boucle ou afficher un message SDL
+          quit = 1;  
+        }
       }
-      synchro = 0;
-    }
+      break;
+
+      // Message 'P' : une accusation a échoué
+      case 'P':
+      {
+        int loser;
+        if (sscanf(gbuffer, "P %d", &loser) == 1) {
+          printf(">>> Le joueur %d a fait une fausse accusation.\n", loser);
+          // par exemple, tu peux désactiver son bouton Go
+          if (loser == gId) goEnabled = 0;
+        }
+      }
+      break;
+      
+    }  // ← assure-toi que ce '}' ferme bien le switch
+
+    synchro = 0;  // ← et non pas à l’intérieur du switch !
+}
 
     SDL_Rect dstrect_grille = {512 - 250, 10, 500, 350};
     SDL_Rect dstrect_image = {0, 0, 500, 330};
@@ -694,3 +725,4 @@ int main(int argc, char **argv) {
 
   return 0;
 }
+

@@ -321,14 +321,53 @@ int main(int argc, char *argv[]) {
       switch (buffer[0]) {
       case 'G':
         // RAJOUTER DU CODE ICI
-        break;
+		// on recoit de cette manière "G %d %d"
+		// si le joueur qui envoie le message a trouver deck[12] alors on broadcast "W %d"
+		// sinon on broadcast "L %d"
+		int guess; 
+		int guesser;
+		int rcv = sscanf(buffer, "%c %d %d", &guesser, &guess);	
+		if (rcv == 2) {
+			if (deck[12] == guess) {
+				sprintf(reply, "W %d", guesser);
+				printf("W %d\n", guesser);
+				broadcastMessage(reply);
+			} else {
+				printf("P %d\n", guesser);
+				sprintf(reply, "P %d", guesser);
+				broadcastMessage(reply);
+			}
+		}
+		
+		break;
       case 'O':
         // RAJOUTER DU CODE ICI
+        // Enquête type O : réception "O <id> <symbole>"
+        {
+          char com;
+          int id, sym;
+          sscanf(buffer, "%c %d %d", &com, &id, &sym);
+          for (int p = 0; p < 4; p++) {
+            if (p == id) continue;
+            int pres = (tableCartes[p][sym] > 0) ? 100 : 0;
+            sprintf(reply, "V %d %d %d", p, sym, pres);
+            sendMessageToClient(tcpClients[p].ipAddress,
+                                tcpClients[p].port, reply);
+          }
+        }
         break;
       case 'S':
         // RAJOUTER DU CODE ICI
-        break;
-      default:
+        // Enquête type S : réception "S <id> <cible> <symbole>"
+        {
+          char com;
+          int id, cible, sym;
+          sscanf(buffer, "%c %d %d %d", &com, &id, &cible, &sym);
+          int cnt = tableCartes[cible][sym];
+          sprintf(reply, "V %d %d %d", cible, sym, cnt);
+          sendMessageToClient(tcpClients[id].ipAddress,
+                              tcpClients[id].port, reply);
+        }
         break;
       }
     }
@@ -337,3 +376,4 @@ int main(int argc, char *argv[]) {
   close(sockfd);
   return 0;
 }
+
